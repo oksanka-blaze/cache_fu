@@ -67,12 +67,16 @@ module ActsAsCached
     end
 
     def memcache_client(config)
+      begin
       (config[:client] || "MemCache").classify.constantize.new(config)
+      rescue
+        nil
+      end
     end
 
     def setup_session_store
       return # Set up session store like normal in config/application.rb
-      
+
       ActionController::Base.session_store = :mem_cache_store
       cache = defined?(SESSION_CACHE) ? SESSION_CACHE : CACHE
       ActionController::Session::AbstractStore::DEFAULT_OPTIONS.update(
